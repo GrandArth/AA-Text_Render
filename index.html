@@ -11,6 +11,16 @@
             white-space: normal;
             width: 80vw;
         }
+
+        .mark-up {
+            font-size: 8px;
+            line-height: 10px;
+            white-space: normal;
+        }
+
+        .style-input {
+            width: 160px;
+        }
     </style>
 </head>
 
@@ -19,8 +29,30 @@
     <table>
         <tr>
             <td>
-                <textarea rows="5" cols="130" name="text" placeholder="Input your AA" id="aaText"></textarea>
+                <textarea rows="10" cols="130" name="text" placeholder="Input your AA" id="aaText"></textarea>
                 <canvas hidden id="aaCanvas"></canvas>
+            </td>
+            <td>
+                <div>
+                    <p class="mark-up">Font</p>
+                    <input type="text" name="font-input" value="MS PGothic" onchange="changeFont(this)"
+                        class="style-input">
+                </div>
+                <div>
+                    <p class="mark-up">Line Height</p>
+                    <input type="number" name="lineheight-input" step=2 value=18 onchange="changeLineHeight(this)"
+                        class="style-input">
+                </div>
+                <div>
+                    <p class="mark-up">Font Width</p>
+                    <input type="number" name="fontwidth-input" step=2 value=16 onchange="changeFontWidth(this)"
+                        class="style-input">
+                </div>
+                <div>
+                    <p class="mark-up">Width Offset</p>
+                    <input type="number" name="widthoffset-input" step=2 value=10 onchange="changeWidthOffset(this)"
+                        class="style-input">
+                </div>
             </td>
         </tr>
         <tr>
@@ -31,6 +63,21 @@
     </table>
 
     <script>
+        function changeFont(font_input) {
+            usedFont = font_input.value;
+        }
+
+        function changeLineHeight(line_height) {
+            usedFontLineHeight = line_height.value;
+        }
+
+        function changeFontWidth(font_wdith) {
+            usedFontWidth = font_wdith.value;
+        }
+
+        function changeWidthOffset(width_offset) {
+            leftAlignedOffset = width_offset.value;
+        }
 
         function getWidthOfText(txt, fontname, fontsize) {
             if (getWidthOfText.c === undefined) {
@@ -43,10 +90,10 @@
             return getWidthOfText.ctx.measureText(txt).width;
         }
 
-        function refreshInputText(INPUT_PROPERTY,fontsize,thefont) {
+        function refreshInputText(INPUT_PROPERTY, fontsize, thefont) {
             INPUT_PROPERTY.TEXT_value = INPUT_PROPERTY.TEXT_self.value;
             INPUT_PROPERTY.LINES_oftext = INPUT_PROPERTY.TEXT_value.split('\n');
-            INPUT_PROPERTY.WIDTH_ofeachline = INPUT_PROPERTY.LINES_oftext.map(function (text) { return getWidthOfText(text,`${thefont}`,`${fontsize}px`); });
+            INPUT_PROPERTY.WIDTH_ofeachline = INPUT_PROPERTY.LINES_oftext.map(function (text) { return getWidthOfText(text, `${thefont}`, `${fontsize}px`); });
             return INPUT_PROPERTY;
         }
 
@@ -61,14 +108,14 @@
         };
 
         var imageElem = document.getElementById('resultedImage');
-        var usedFont= "MS PGothic"
+        var usedFont = "MS PGothic"
         var usedFontLineHeight = 18;
-        var usedFontWidth= 16;
+        var usedFontWidth = 16;
         var leftAlignedOffset = 10;
 
         document.getElementById('aaText').addEventListener('input', function () {
 
-            inputTextObject = refreshInputText(inputTextObject,usedFontWidth,usedFont);
+            inputTextObject = refreshInputText(inputTextObject, usedFontWidth, usedFont);
 
             canvasObject.THECANVAS.width = Math.max.apply(null, inputTextObject.WIDTH_ofeachline) + leftAlignedOffset;
             canvasObject.THECANVAS.height = inputTextObject.LINES_oftext.length * usedFontLineHeight + usedFontLineHeight;
@@ -76,7 +123,7 @@
             canvasObject.CONTEXT.fillStyle = "#FFFFFF";
             canvasObject.CONTEXT.fillRect(0, 0, canvasObject.THECANVAS.width, canvasObject.THECANVAS.height);
             canvasObject.CONTEXT.fillStyle = "#1E1E1E";
-            canvasObject.CONTEXT.font = "16px MS PGothic";
+            canvasObject.CONTEXT.font = `${usedFontWidth}px ${usedFont}`;
 
             for (var i = 0; i < inputTextObject.LINES_oftext.length; i++) {
                 canvasObject.CONTEXT.fillText(inputTextObject.LINES_oftext[i], leftAlignedOffset, usedFontLineHeight * (i + 2));
