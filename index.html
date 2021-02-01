@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>AA制图器</title>
+        <style>
+            input {font-family:MS PGothic;font-size:16px;line-height: 18px;white-space:normal;width:80vw;}
+        </style>
+    </head>
+
+    <body>
+
+        <table>
+            <tr>
+                <td>
+                    <textarea rows="5" cols="130" name="text" placeholder="Enter text" id="aaText"></textarea>
+                    <canvas hidden id="aaCanvas"></canvas>
+                </td>
+            </tr>
+            <tr>
+                <td>        
+                    <img id="resultedImage">
+                </td>
+            </tr>
+        </table>
+
+        <script>
+            var aaCanvasContext = document.getElementById('aaCanvas').getContext('2d');
+            var aaCanvas = aaCanvasContext.canvas;
+            var textArea = document.getElementById('aaText');
+            var imageElem = document.getElementById('resultedImage');
+            var inputText = textArea.value;
+            var linesOfInputText = inputText.split('\n');
+            var widthOfEachLines = linesOfInputText.map(function(text){return text.length;});
+
+            aaCanvas.globalCompositeOperation = "source-over";
+            aaCanvas.width = Math.max.apply(null,widthOfEachLines)*8;
+            aaCanvas.height = linesOfInputText.length*18;
+
+            document.getElementById('aaText').addEventListener('input', function (){
+
+                imageElem.src = "";
+
+                aaCanvasContext.fillStyle = "#FFFFFF";
+                aaCanvasContext.fillRect(0, 0, aaCanvas.width, aaCanvas.height);
+
+                aaCanvasContext.fillStyle = "#1E1E1E";
+                aaCanvasContext.font="16px MS PGothic";
+
+                for(var i = 0; i < linesOfInputText.length; i++)
+                {
+                    aaCanvasContext.fillText(linesOfInputText[i], 10, 18*(i+1));
+                    imageElem.src = aaCanvas.toDataURL();
+                    console.log(imageElem.src);
+                }
+            }, false);
+        </script>
+        
+    </body>
+</html>
