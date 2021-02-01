@@ -1,60 +1,93 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>AA制图器</title>
-        <style>
-            input {font-family:MS PGothic;font-size:16px;line-height: 18px;white-space:normal;width:80vw;}
-        </style>
-    </head>
 
-    <body>
+<head>
+    <meta charset="utf-8">
+    <title>AA制图器</title>
+    <style>
+        input {
+            font-size: 16px;
+            line-height: 18px;
+            white-space: normal;
+            width: 80vw;
+        }
+    </style>
+</head>
 
-        <table>
-            <tr>
-                <td>
-                    <textarea rows="5" cols="130" name="text" placeholder="Enter text" id="aaText"></textarea>
-                    <canvas hidden id="aaCanvas"></canvas>
-                </td>
-            </tr>
-            <tr>
-                <td>        
-                    <img id="resultedImage">
-                </td>
-            </tr>
-        </table>
+<body>
 
-        <script>
-            var aaCanvasContext = document.getElementById('aaCanvas').getContext('2d');
-            var aaCanvas = aaCanvasContext.canvas;
-            var textArea = document.getElementById('aaText');
-            var imageElem = document.getElementById('resultedImage');
-            var inputText = textArea.value;
-            var linesOfInputText = inputText.split('\n');
-            var widthOfEachLines = linesOfInputText.map(function(text){return text.length;});
+    <table>
+        <tr>
+            <td>
+                <textarea rows="5" cols="130" name="text" placeholder="Input your AA" id="aaText"></textarea>
+                <canvas hidden id="aaCanvas"></canvas>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img id="resultedImage">
+            </td>
+        </tr>
+    </table>
 
-            aaCanvas.globalCompositeOperation = "source-over";
-            aaCanvas.width = Math.max.apply(null,widthOfEachLines)*8;
-            aaCanvas.height = linesOfInputText.length*18;
+    <script>
 
-            document.getElementById('aaText').addEventListener('input', function (){
+        function getWidthOfText(txt, fontname, fontsize) {
+            if (getWidthOfText.c === undefined) {
+                getWidthOfText.c = document.createElement('canvas');
+                getWidthOfText.ctx = getWidthOfText.c.getContext('2d');
+            }
+            var fontspec = fontsize + ' ' + fontname;
+            if (getWidthOfText.ctx.font !== fontspec)
+                getWidthOfText.ctx.font = fontspec;
+            return getWidthOfText.ctx.measureText(txt).width;
+        }
 
-                imageElem.src = "";
+        function refreshInputText(INPUT_PROPERTY,fontsize,thefont) {
+            INPUT_PROPERTY.TEXT_value = INPUT_PROPERTY.TEXT_self.value;
+            INPUT_PROPERTY.LINES_oftext = INPUT_PROPERTY.TEXT_value.split('\n');
+            INPUT_PROPERTY.WIDTH_ofeachline = INPUT_PROPERTY.LINES_oftext.map(function (text) { return getWidthOfText(text,`${thefont}`,`${fontsize}px`); });
+            return INPUT_PROPERTY;
+        }
 
-                aaCanvasContext.fillStyle = "#FFFFFF";
-                aaCanvasContext.fillRect(0, 0, aaCanvas.width, aaCanvas.height);
 
-                aaCanvasContext.fillStyle = "#1E1E1E";
-                aaCanvasContext.font="16px MS PGothic";
+        var inputTextObject = {
+            TEXT_self: document.getElementById('aaText')
+        };
 
-                for(var i = 0; i < linesOfInputText.length; i++)
-                {
-                    aaCanvasContext.fillText(linesOfInputText[i], 10, 18*(i+1));
-                    imageElem.src = aaCanvas.toDataURL();
-                    console.log(imageElem.src);
-                }
-            }, false);
-        </script>
-        
-    </body>
+        var canvasObject = {
+            CONTEXT: document.getElementById('aaCanvas').getContext('2d'),
+            THECANVAS: document.getElementById('aaCanvas').getContext('2d').canvas
+        };
+
+        var imageElem = document.getElementById('resultedImage');
+        var usedFont= "MS PGothic"
+        var usedFontLineHeight = 18;
+        var usedFontWidth= 16;
+        var leftAlignedOffset = 10;
+
+        document.getElementById('aaText').addEventListener('input', function () {
+
+            inputTextObject = refreshInputText(inputTextObject,usedFontWidth,usedFont);
+
+            canvasObject.THECANVAS.width = Math.max.apply(null, inputTextObject.WIDTH_ofeachline) + leftAlignedOffset;
+            canvasObject.THECANVAS.height = inputTextObject.LINES_oftext.length * usedFontLineHeight + usedFontLineHeight;
+            canvasObject.THECANVAS.globalCompositeOperation = "source-over";
+            canvasObject.CONTEXT.fillStyle = "#FFFFFF";
+            canvasObject.CONTEXT.fillRect(0, 0, canvasObject.THECANVAS.width, canvasObject.THECANVAS.height);
+            canvasObject.CONTEXT.fillStyle = "#1E1E1E";
+            canvasObject.CONTEXT.font = "16px MS PGothic";
+
+            for (var i = 0; i < inputTextObject.LINES_oftext.length; i++) {
+                canvasObject.CONTEXT.fillText(inputTextObject.LINES_oftext[i], leftAlignedOffset, usedFontLineHeight * (i + 2));
+            }
+
+            imageElem.src = canvasObject.THECANVAS.toDataURL();
+
+        }, false);
+
+    </script>
+
+</body>
+
 </html>
