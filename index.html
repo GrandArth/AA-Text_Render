@@ -28,10 +28,12 @@
 
     <table>
         <tr>
+
             <td>
-                <textarea rows="10" cols="130" name="text" placeholder="Input your AA" id="aaText"></textarea>
+                <textarea rows="10" cols="130" name="text" placeholder="Input your AA here" id="aaText"></textarea>
                 <canvas hidden id="aaCanvas"></canvas>
             </td>
+            
             <td>
                 <div>
                     <p class="mark-up">Font</p>
@@ -63,8 +65,17 @@
     </table>
 
     <script>
+
+        var imageElem = document.getElementById('resultedImage');
+        var usedFont = "MS PGothic"
+        var usedFontLineHeight = 18;
+        var usedFontWidth = 16;
+        var leftAlignedOffset = 10;
+
+
         function changeFont(font_input) {
             usedFont = font_input.value;
+            console.log("usedFont changed to ${usedFont}")
         }
 
         function changeLineHeight(line_height) {
@@ -78,6 +89,7 @@
         function changeWidthOffset(width_offset) {
             leftAlignedOffset = width_offset.value;
         }
+        
 
         function getWidthOfText(txt, fontname, fontsize) {
             if (getWidthOfText.c === undefined) {
@@ -98,7 +110,7 @@
         }
 
 
-        var inputTextObject = {
+        var AA_TextObject = {
             TEXT_self: document.getElementById('aaText')
         };
 
@@ -107,26 +119,27 @@
             THECANVAS: document.getElementById('aaCanvas').getContext('2d').canvas
         };
 
-        var imageElem = document.getElementById('resultedImage');
-        var usedFont = "MS PGothic"
-        var usedFontLineHeight = 18;
-        var usedFontWidth = 16;
-        var leftAlignedOffset = 10;
+        // The HTMLCanvasElement.getContext() method returns a drawing context on the canvas, or null if the context identifier is not supported, or the canvas has already been set to a different context mode. 
+
 
         document.getElementById('aaText').addEventListener('input', function () {
 
-            inputTextObject = refreshInputText(inputTextObject, usedFontWidth, usedFont);
+            AA_TextObject = refreshInputText(AA_TextObject, usedFontWidth, usedFont);
 
-            canvasObject.THECANVAS.width = Math.max.apply(null, inputTextObject.WIDTH_ofeachline) + leftAlignedOffset;
-            canvasObject.THECANVAS.height = inputTextObject.LINES_oftext.length * usedFontLineHeight + usedFontLineHeight;
+            canvasObject.THECANVAS.width = Math.max.apply(null, AA_TextObject.WIDTH_ofeachline) + leftAlignedOffset;
+            canvasObject.THECANVAS.height = AA_TextObject.LINES_oftext.length * usedFontLineHeight + usedFontLineHeight;
             canvasObject.THECANVAS.globalCompositeOperation = "source-over";
             canvasObject.CONTEXT.fillStyle = "#FFFFFF";
-            canvasObject.CONTEXT.fillRect(0, 0, canvasObject.THECANVAS.width, canvasObject.THECANVAS.height);
+            console.log("Canvas FillStyle changed to #FFFFFF")
+            // canvasObject.CONTEXT.fillRect(0, 0, canvasObject.THECANVAS.width, canvasObject.THECANVAS.height);
+            // Above command draw a white rectangle on the "Nothingness" canvas, so that the picture will have a background.
+            // Uncomment it to have white background.
             canvasObject.CONTEXT.fillStyle = "#1E1E1E";
+            console.log("Canvas FillStyle changed to #1E1E1E")
             canvasObject.CONTEXT.font = `${usedFontWidth}px ${usedFont}`;
 
-            for (var i = 0; i < inputTextObject.LINES_oftext.length; i++) {
-                canvasObject.CONTEXT.fillText(inputTextObject.LINES_oftext[i], leftAlignedOffset, usedFontLineHeight * (i + 2));
+            for (var i = 0; i < AA_TextObject.LINES_oftext.length; i++) {
+                canvasObject.CONTEXT.fillText(AA_TextObject.LINES_oftext[i], leftAlignedOffset, usedFontLineHeight * (i + 2));
             }
 
             imageElem.src = canvasObject.THECANVAS.toDataURL();
